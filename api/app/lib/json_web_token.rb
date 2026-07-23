@@ -29,7 +29,7 @@ class JsonWebToken
   end
 
   def self.hmac_secret
-    ENV.fetch('SECRET_KEY_BASE')
+    ENV.fetch('SECRET_KEY_BASE', Rails.application.secret_key_base || 'test-secret')
   end
   private_class_method :hmac_secret
 end

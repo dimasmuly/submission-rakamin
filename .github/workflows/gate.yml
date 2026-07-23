@@ -1,0 +1,41 @@
+name: Workflow Gate (Definition of Ready)
+
+on:
+  pull_request:
+    types: [opened, edited, synchronize, reopened]
+
+jobs:
+  check-inputs:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check Definition of Ready inputs
+        uses: actions/github-script@v6
+        with:
+          script: |
+            const body = context.payload.pull_request.body;
+            if (!body) {
+              core.setFailed("PR body is empty. Please fill out the PR template.");
+              return;
+            }
+
+            const requiredChecks = [
+              "**Spec/PRD**",
+              "**Acceptance Criteria / Test Scenarios**",
+              "**Solution / Design Plan**"
+            ];
+
+            let failed = false;
+            for (const check of requiredChecks) {
+              // Look for the checked markdown box: - [x] **CheckName** or - [X] **CheckName**
+              const regex = new RegExp(`- \\[x\\]\\s+${check.replace(/[.*+?^$\\{\\}()|[\\]\\\\]/g, '\\$&')}`, 'i');
+              if (!regex.test(body)) {
+                core.error(`Missing input: ${check} is not checked.`);
+                failed = true;
+              }
+            }
+
+            if (failed) {
+              core.setFailed("Definition of Ready is not met. All required inputs must be checked in the PR template.");
+            } else {
+              core.info("All Definition of Ready inputs are provided. Gate passed.");
+            }
