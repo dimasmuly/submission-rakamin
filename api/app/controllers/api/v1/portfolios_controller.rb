@@ -153,7 +153,7 @@ module Api
         if @session
           @portfolio = @session.portfolio
         else
-          @portfolio = Portfolio.find(params[:id])
+          @portfolio = Portfolio.joins(:session).where(sessions: { tenant_id: Current.tenant_id }).find(params[:id])
         end
       rescue ActiveRecord::RecordNotFound
         json_error("Portfolio not found", :not_found)
@@ -178,7 +178,7 @@ module Api
           skill_id:          skill.skill_id,
           skill_label:       skill.skill_label,
           is_discovered:     skill.is_discovered,
-          ai_level:          skill.ai_level,
+          ai_level:          skill.ai_level ? "L#{skill.ai_level}" : nil,
           ai_confidence:     skill.ai_confidence,
           evidence:          skill.evidence_quotes,
           competency_summary: skill.competency_summary

@@ -26,4 +26,5 @@ vertex_ai_credentials.json
 
 
 # Ignore Public Docs
-/tech-docs
+/tech-docs/vendor/
+/vendor/
